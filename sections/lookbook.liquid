@@ -70,9 +70,6 @@
 
       <div class="lookbook-modal__inner">
         <div class="lookbook-modal__products">
-          {%- if section.settings.modal_heading != blank -%}
-            <h3 class="lookbook-modal__title">{{ section.settings.modal_heading | escape }}</h3>
-          {%- endif -%}
 
           {%- if look_collection != blank and look_collection.products_count > 0 -%}
             <div class="lookbook-modal__product-list">
