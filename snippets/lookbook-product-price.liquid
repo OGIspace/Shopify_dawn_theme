@@ -1,0 +1,45 @@
+{% comment %}
+  Ціна для lookbook-модалки: без блоку price__regular, якщо немає compare_at_price (немає знижки).
+
+  Accepts:
+  - variant: {Object} варіант (обовʼязково)
+{% endcomment %}
+{%- liquid
+  assign on_sale = false
+  if variant.compare_at_price != blank and variant.compare_at_price > variant.price
+    assign on_sale = true
+  endif
+
+  assign currency_code = cart.currency.iso_code
+  if currency_code == blank and localization.country.currency.iso_code != blank
+    assign currency_code = localization.country.currency.iso_code
+  endif
+  if currency_code == blank
+    assign currency_code = shop.currency
+  endif
+
+  assign money_price = variant.price | money_without_currency | append: ' ' | append: currency_code
+  assign money_compare = variant.compare_at_price | money_without_currency | append: ' ' | append: currency_code
+-%}
+
+<div class="price{% if on_sale %} price--on-sale{% endif %} lookbook-modal__price-root">
+  <div class="price__container">
+    {%- if on_sale -%}
+      <div class="price__sale">
+        <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
+        <span>
+          <s class="price-item price-item--regular">{{ money_compare }}</s>
+        </span>
+        <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.sale_price' | t }}</span>
+        <span class="price-item price-item--sale price-item--last">{{ money_price }}</span>
+      </div>
+    {%- else -%}
+      <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
+      <span class="price-item price-item--last lookbook-modal__price-current">{{ money_price }}</span>
+    {%- endif -%}
+
+    {%- if variant.unit_price_measurement -%}
+      {% render 'unit-price', price: variant.unit_price, measurement: variant.unit_price_measurement %}
+    {%- endif -%}
+  </div>
+</div>
